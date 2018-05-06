@@ -1,0 +1,136 @@
+/**
+ * New model file
+ */
+namespace org.acme.jewelry_network
+
+// BASE DEFINTIONS
+
+concept JewelryDetail {
+  -->  Manufacturer make
+  //Model Type: Ring, Necklace, Bracelet
+  o String ModelType
+  //DiamondWeight: 0.5 ct, 1 ct ..ect
+  o String DiamondWeight
+  //Material: Gold, Sliver, Platinum
+  o String Material
+}
+
+abstract participant Company identified by companyID{
+  //Base defintion of a company
+  //Can be set to retailer, Manufacturer, Regulator
+  o String companyID
+  o String companyName
+}
+
+participant Person identified by username {
+  //Base definition of the person
+  o String username
+  o String phoneNumber 
+  o String email
+  o String address
+}
+
+// Retailer DEFINITIONS
+participant Retailer extends Company{
+}
+
+enum CustomerOrderStatus {
+  //Different Stage of the retailer order(e.g. Customer -> Retailer)
+  o PLACED
+  o SCHEDULED_FOR_MANUFACTURE
+  o JIN_ASSIGNED
+  o OWNER_ASSIGNED
+  o DELIVERED
+}
+
+asset CustomerOrder identified by customerOrderId {
+  o String customerOrderId
+  o JewelryDetail jewelryDetail
+  o CustomerOrderStatus customerOrderStatus
+  //不懂
+  --> Person customer
+}
+
+transaction CustomerPlaceOrder {
+  o String customerOrderId
+  o JewelryDetail jewelryDetail
+  --> Person customer
+}
+
+event CustomerPlaceOrderEvent {
+  o String customerOrderId
+  o JewelryDetail jewelryDetail
+  --> Person customer
+}
+
+transaction RetailerUpdateOrderStatus {
+  o CustomerOrderStatus customerOrderStatus
+  o String jin optional
+  --> CustomerOrder customerorder
+}
+
+event RetailerUpdateOrderStatusEvent {
+  o CustomerOrderStatus customerOrderStatus
+  o CustomerOrder customerorder
+}
+
+// MANUFACTURE DEFINITIONS
+participant Manufacturer extends Company{
+}
+
+enum RetailerOrderStatus {
+  o PLACED
+  o MANUFACTURING
+  o MINEFILED_ASSIGNED
+  o DELIVERED
+}
+
+asset RetailerOrder identified by retailerOrderId {
+  o String retailerOrderId
+  o JewelryDetail jewelryDetail
+  o RetailerOrderStatus retailerOrderStatus
+  --> Company retailer
+}
+
+transaction RetailerPlaceOrder {
+  o String retailerOrderID
+  o JewelryDetail jewelryDetail
+  --> Company retailer
+}
+
+event retailerPlaceOrderEvent {
+  o String retailerOrderId
+  o JewelryDetail jewelryDetail
+  --> Company retailer
+}
+
+transaction ManufacturerUpdateOrderStatus {
+  o RetailerOrderStatus retailerOrderStatus
+  o String mineFieldId optional
+  --> RetailerOrder retailerOrder
+}
+
+event ManufacturerUpdateOrderStatusEvent{
+  o RetailerOrderStatus retailorderstatus
+  o RetailerOrder retailerOrder
+}
+
+// REGULATOR DEFINITIONS
+participant Regulator extends Company{
+}
+
+enum JewelryStatus {
+  o ACTIVE
+  o SOLD_TO_CUSTOMER
+  o STOLEN
+}
+
+asset Jewelry identified by jin {
+  o String jin
+  o JewelryDetail jewelryDetail
+  o JewelryStatus jewelryStatus
+  --> Person owner optional
+}
+
+transaction SetupDemo {
+}
