@@ -26,8 +26,29 @@ async function retailerUpdateOrderStatus(updateOrderRequest){
 
 }
 
-async function retailerPlaceOrder(orderRequest){
 
+// retailer order function
+async function retailerPlaceOrder(orderRequest){
+    console.log('retailerPlaceOrder')
+
+    const factory = getFactory();
+    const namespace = 'org.acme.jewelry_network';
+
+    const retailerOrder = factory.newResource(namespace, 'RetailerOrder', orderRequest. RetailerOrderId);
+    retailerOrder.CustomerOrder = orderRequest.CustomerOrder;
+    retailerOrder.retailerOrderStatus = 'PLACED';
+    retailerOrder.retailer = factory.newRelationship(namespace,'Company',orderRequest.retailer.getIdentifier());
+
+    //save the retailer order
+    const assetRegistry = await getAssetRegistry(retailerOrder.getFullyQualifiedType());
+    await assetRegistry.add(retailerOrder);
+
+     // emit the event
+     const retailerPlaceOrderEvent = factory.newEvent(namespace, 'RetailerPlaceOrderEvent');
+     retailerPlaceOrderEvent.retailerOrderId = retailerOrder.retailerOrderId
+     retailerPlaceOrderEvent.CustomerOrder = retailerOrder.CustomerOrder
+     retailerPlaceOrderEvent.retailer = retailerOrder.retailer
+     emit(retailerPlaceOrderEvent)
 
 }
 
