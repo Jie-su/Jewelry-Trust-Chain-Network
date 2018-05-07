@@ -195,15 +195,15 @@ Within this network permissions are outlines for the participants outlining what
 
 `RetailerUpdateOrderStatus` \- Allows a retailer to CREATE and READ RetailerUpdateOrderStatus transactions that refer to a customerOrder that they are specified as the _jewelryDetail.sell_ in.
 
-`RetailerReadOrder` - Allows a retailer to READ a CustomerOrder asset that they are specified as the*jewelryDetail.make*  in.
+`RetailerReadOrder` - Allows a retailer to READ a CustomerOrder asset that they are specified as the *jewelryDetail.sell*  in.
 
-`RetailerReadJewelries` - Allows a retailer to READ a Jewelry asset that they are specified as the _jewelryDetail.make_ in.
+`RetailerReadJewelries` - Allows a retailer to READ a Jewelry asset that they are specified as the _jewelryDetail.sell_ in.
 
 ### Manufacturer
 
 `ManufacturerUpdateOrder` \- Allows a manufacturer to UPDATE a RetailerOrder asset's data only using a ManufacturerUpdateOrderStatus transaction. The manufacturer must also be specified as the _jewelryDetail.make_ in the RetailerOrder asset.
 
-`ManufacturerUpdateOrderStatus` \- Allows a manufacturer to CREATE and READ UpdateOrderStatus transactions that refer to a retailerOrder that they are specified as the _jewelryDetail.make_ in.
+`ManufacturerUpdateOrderStatus` \- Allows a manufacturer to CREATE and READ ManufacturerUpdateOrderStatus transactions that refer to a retailerOrder that they are specified as the _jewelryDetail.make_ in.
 
 `ManufacturerReadOrder` \- Allows a manufacturer to READ a RetailerOrder asset that they are specified as the _jewelryDetail.make_ in.
 
