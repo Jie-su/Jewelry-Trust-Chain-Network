@@ -55,6 +55,8 @@ async function retailerUpdateOrderStatus(updateOrderRequest){
     emit(retailerUpdateOrderStatusEvent);
 }
 
+
+// retailer order function
 async function retailerPlaceOrder(orderRequest){
     console.log('retailerPlaceOrder');
 
