@@ -38,7 +38,6 @@ enum CustomerOrderStatus {
   //Different Stage of the retailer order(e.g. Customer -> Retailer)
   o PLACED
   o SCHEDULED_FOR_MANUFACTURE
-  o JIN_ASSIGNED
   o OWNER_ASSIGNED
   o DELIVERED
 }
@@ -81,7 +80,7 @@ participant Manufacturer extends Company{
 enum RetailerOrderStatus {
   o PLACED
   o MANUFACTURING
-  o MINEFILED_ASSIGNED
+  o JIN_ASSIGNED
   o DELIVERED
 }
 
@@ -111,7 +110,7 @@ transaction ManufacturerUpdateOrderStatus {
 }
 
 event ManufacturerUpdateOrderStatusEvent{
-  o RetailerOrderStatus retailorderstatus
+  o RetailerOrderStatus retailorderStatus
   o RetailerOrder retailerOrder
 }
 
@@ -120,13 +119,15 @@ participant Regulator extends Company{
 }
 
 enum JewelryStatus {
-  o ACTIVE
+  o CERTIFICATION
   o SOLD_TO_CUSTOMER
+  // o ACTIVE
   o STOLEN
 }
 
 asset Jewelry identified by jin {
   o String jin
+  o String mineFieldId
   o JewelryDetail jewelryDetail
   o JewelryStatus jewelryStatus
   --> Person owner optional
