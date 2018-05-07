@@ -1,4 +1,9 @@
 //customer palce order to the retailers
+/**
+ * Customer place an order from the retailer for a jewelry
+ * @param {org.acme.jewelry_network.CustomerPlaceOrder} customerPlaceOrder - the customerPlaceOrder transaction
+ * @transaction
+ */
 async function customerPlaceOrder(orderRequest){
     console.log('customerPlaceOrder');
 
@@ -22,6 +27,11 @@ async function customerPlaceOrder(orderRequest){
      emit(customerPlaceOrderEvent);
 }
 
+/**
+ * Retailer updates the status of a customerOrder
+ * @param {org.acme.jewelry_network.RetailerUpdateOrderStatus} retailerUpdateOrderStatus - the RetailerUpdateOrderStatus transaction
+ * @transaction
+ */
 async function retailerUpdateOrderStatus(updateOrderRequest){
     console.log('retailerUpdateOrderStatus');
 
@@ -55,6 +65,11 @@ async function retailerUpdateOrderStatus(updateOrderRequest){
     emit(retailerUpdateOrderStatusEvent);
 }
 
+/**
+ * Retailer places an order from the manufacturer for a jewelry
+ * @param {org.acme.jewelry_network.RetailerPlaceOrder} retailerPlaceOrder - the RetailerPlaceOrder transaction
+ * @transaction
+ */
 async function retailerPlaceOrder(orderRequest){
     console.log('retailerPlaceOrder');
 
@@ -78,6 +93,12 @@ async function retailerPlaceOrder(orderRequest){
     emit(retailerPlaceOrderEvent);
 }
 
+
+/**
+ * Manufacturer updates the status of a retailerOrder
+ * @param {org.acme.jewelry_network.ManufacturerUpdateOrderStatus} manufacturerUpdateOrderStatus - the ManufacturerUpdateOrderStatus transaction
+ * @transaction
+ */
 async function manufacturerUpdateOrderStatus(updateOrderRequest){
     console.log('manufacturerUpdateOrderStatus');
 
@@ -115,12 +136,28 @@ async function manufacturerUpdateOrderStatus(updateOrderRequest){
     emit(manufacturerUpdateOrderStatusEvent);
 }
 
+/**
+ * Create the participants to use in the demo
+ * @param {org.acme.jewelry_network.SetupDemo} setupDemo - the SetupDemo transaction
+ * @transaction
+ */
 async function setupDemo(){
     console.log('setipDemo');
 
     const factory = getFactory();
     const namespace = 'org.acme.jewelry_network';
 
-    let customer = ['zhangsan','lisi','wangwu'];
-    let manufacturers = [];
+    let people = ['zhangsan','lisi','wangwu'];
+    let manufacturers ;
+    let retailers;
+    
+    const jewelries = {};
+
+    //convert array names of people to be array of participant resources of type Person with identifier of that name
+    people = people.map(function (person) {
+        return factory.newResource(namespace, 'Person', person);
+    });
+
+    // create array of Retailer and Manufacturer particpant resources identified by the top level keys in jewelries const
+
 }
