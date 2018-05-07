@@ -1,183 +1,182 @@
-# Vehicle Manufacture Network
+# Jewelry Trust Chain Network
 
-> This network tracks the manufacture of vehicles from an initial order request through to their completion by the manufacturer. A regulator is able to provide oversight throughout this whole process.
+> This network tracks the manufacture of jewelry from an initial order request through to their completion by the manufacturer. A regulator is able to provide oversight throughout this whole process.
 
 ## Models within this business network
 
 ### Participants
 
-`Person\` `Manufacturer\` `Regulator\`
+`Person` `Manufacturer` `Regulator` `Retailer`
 
 ### Assets
 
-`Order\` `Vehicle\`
+`CustomerOrder` `Jewelry` `RetailerOrder`
 
 ### Transactions
 
-`PlaceOrder\` `UpdateOrderStatus\` `SetupDemo\`
+`CustomerPlaceOrder` `RetailerUpdateOrderStatus` `SetupDemo` `RetailerPlaceOrder` `ManufacturerUpdateOrderStatus``RetailerUpdateOrderStatus`
 
 ### Events
 
-`PlaceOrderEvent\` `UpdateOrderStatusEvent\`
+`CustomerPlaceOrderEvent` `RetailerUpdateOrderStatusEvent` `RetailerPlaceOrderEvent` `ManufacturerUpdateOrderStatusEvent`
 
 ## Example use of this business network
 
-A `Person\` uses a manufacturer's application to build their desired car and order it. The application submits a `PlaceOrder\` transaction which creates a new `Order\` asset containing the details of the vehicle the `Person\` wishes to have made for them. The `Manufacturer\` begins work on the car and as it proceeds through stages of production the `Manufacturer\` submits `UpdateOrderStatus\` transactions to mark the change in status for the `Order\` e.g. updating the status from PLACED to SCHEDULED\_FOR\_MANUFACTURE. Once the `Manufacturer\` has completed production for the `Order\` they register the car by submitting an `UpdateOrderStatus\` transaction with the status VIN\_ASSIGNED (also providing the VIN to register against) and a `Vehicle\` asset is formally added to the registry using the details specified in the `Order\`. Once the car is registered then the `Manufacturer\` submits an `UpdateOrderStatus\` transaction with a status of OWNER\_ASSIGNED at which point the owner field of the `Vehicle\` is set to match the orderer field of the `Order\`. The regulator would perform oversight over this whole process.
+
 
 ## Testing this network within playground
 
-Navigate to the **Test** tab and then submit a `SetupDemo\` transaction:
+Navigate to the **Test** tab and then submit a `SetupDemo` transaction:
 
-```
-
+```javascript
 {
-
-"$class": "org.acme.vehicle_network.SetupDemo"
-
+  "$class": "org.acme.jewelry_network.SetupDemo"
 }
 ```
 
-This will generate three `Manufacturer\` participants, fourteen `Person\` participants, a single `Regulator\` participant and thirteen `Vehicle\` assets.
+This will generate three `Manufacturer` participants, fourteen `Person` participants, three `Retailer` participants, a single `Regulator` participant and nine `Jewelry` assets.
 
-Next order your car (an orange Arium Gamora) by submitting a PlaceOrder transaction:
+Next order your Jewelry (an Tiffany & Co. brand Diamond Ring(0.5ct))) by submitting a CustomerPlaceOrder transaction:
 
-```
-
+```javascript
 {
-
-"$class": "org.acme.vehicle_network.PlaceOrder",
-
-"orderId": "1234",
-
-"vehicleDetails": {
-
-"$class": "org.acme.vehicle_network.VehicleDetails",
-
-"make": "resource:org.acme.vehicle_network.Manufacturer#Arium",
-
-"modelType": "Gamora",
-
-"colour": "Sunburst Orange"
-
-},
-
-"options": {
-
-"trim": "executive",
-
-"interior": "red rum",
-
-"extras": \["tinted windows", "extended warranty"\]
-
-},
-
-"orderer": "resource:org.acme.vehicle_network.Person#Paul"
-
+  "$class": "org.acme.jewelry_network.CustomerPlaceOrder",
+  "customerOrderId": "TC201805070816",
+  "jewelryDetail": {
+    "$class": "org.acme.jewelry_network.JewelryDetail",
+    "make": "resource:org.acme.jewelry_network.Manufacturer#Nova",
+    "sell": "resource:org.acme.jewelry_network.Retailer#Tiffany & Co.",
+    "ModelType": "Ring",
+    "DiamondWeight": "0.5ct",
+    "Material": "Gold"
+  },
+  "customer": "resource:org.acme.jewelry_network.Person#Bin"
 }
 ```
 
-This `PlaceOrder\` transaction generates a new `Order\` asset in the registry and emits a `PlaceOrderEvent\` event.
+This `CustomerPlaceOrder` transaction generates a new `CustomerOrder` asset in the registry and emits a `CustomerPlaceOrderEvent` event.
 
-Now simulate the order being accepted by the manufacturer by submitting an `UpdateOrderStatus\` transaction:
+Now simulate the order being accepted by the retailer by submitting an `RetailerUpdateOrderStatus` transaction:
 
-```
-
+```javascript
 {
-
-"$class": "org.acme.vehicle_network.UpdateOrderStatus",
-
-"orderStatus": "SCHEDULED\_FOR\_MANUFACTURE",
-
-"order": "resource:org.acme.vehicle_network.Order#1234"
-
+  "$class": "org.acme.jewelry_network.RetailerUpdateOrderStatus",
+  "customerOrderStatus": "PLACED",
+  "customerOrder": "resource:org.acme.jewelry_network.CustomerOrder#TC201805070816"
 }
 ```
 
-This `UpdateOrderStatus\` transaction updates the orderStatus of the `Order\` with orderId 1234 in the asset registry and emits an `UpdateOrderStatusEvent\` event.
+This ``RetailerUpdateOrderStatus`` transaction updates the CustomerOrderStatus of the ``CustomerOrder`` with orderId "TC201805070816" in the asset registry and emits an `RetailerUpdateOrderStatusEvent` event.
 
-Simulate the manufacturer registering the vehicle with the regulator by submitting an `UpdateOrderStatus\` transaction:
+Then, the retailer will place an RetailerOrder to the Manufacturer by submit a RetailerPlaceOrder transacation: 
 
-```
-
+```javascript
 {
-
-"$class": "org.acme.vehicle_network.UpdateOrderStatus",
-
-"orderStatus": "VIN_ASSIGNED",
-
-"order": "resource:org.acme.vehicle_network.Order#1234",
-
-"vin": "abc123"
-
+  "$class": "org.acme.jewelry_network.RetailerPlaceOrder",
+  "retailerOrderId": "{
+  "$class": "org.acme.jewelry_network.ManufacturerUpdateOrderStatus",
+  "retailerOrderStatus": "MANUFACTURING",
+  "retailerOrder": "resource:org.acme.jewelry_network.RetailerOrder#NV201805078365"
+}",
+  "jewelryDetail": {
+    "$class": "org.acme.jewelry_network.JewelryDetail",
+    "make": "resource:org.acme.jewelry_network.Manufacturer#Nova",
+    "sell": "resource:org.acme.jewelry_network.Retailer#Tiffany & Co.",
+    "ModelType": "Ring",
+    "DiamondWeight": "0.5ct",
+    "Material": "Gold"
+  },
+  "retailer": "resource:org.acme.jewelry_network.Retailer#Tiffany & Co."
 }
 ```
 
-This `UpdateOrderStatus\` transaction updates the orderStatus of the `Order\` with orderId 1234 in the asset registry, create a new `Vehicle\` based of that \`Order\` in the asset registry and emits an `UpdateOrderStatusEvent\` event. At this stage as the vehicle does not have an owner assigned to it, its status is declared as OFF\_THE\_ROAD.
+This `RetailerPlaceOrder` transaction generates a new `RetailerOrder` asset in the registry and emits a `RetailerPlaceOrderEvent` event.
 
-Next assign the owner of the vehicle using an `UpdateOrderStatus\` transaction:
+Now simulate the order being accept by the manufacturer by submitting an `ManufacturerUpdateOrderStatus` transaction:
 
-```
-
+```javascript
 {
-
-"$class": "org.acme.vehicle_network.UpdateOrderStatus",
-
-"orderStatus": "OWNER_ASSIGNED",
-
-"order": "resource:org.acme.vehicle_network.Order#1234",
-
-"vin": 'abc123'
-
+  "$class": "org.acme.jewelry_network.ManufacturerUpdateOrderStatus",
+  "retailerOrderStatus": "PLACED",
+  "retailerOrder": "resource:org.acme.jewelry_network.RetailerOrder#NV201805078365"
 }
 ```
 
-This `UpdateOrderStatus\` transaction updates the orderStatus of the `Order\` with orderId 1234 in the asset registry, update the `Vehicle\` asset with VIN abc123 to have an owner of Paul (who we intially marked as the orderer in the `PlaceOrder\` transaction) and status of ACTIVE and also emits an `UpdateOrderStatusEvent\` event.
+This `ManufacturerUpdateOrderStatus`updates the RetailerOrderStatus of the `RetailerOrder` with the orderId "NV201805078365" in the asset registry and emits an ``ManufacturerUpdateOrderStatusEvent` event.
 
-Finally complete the ordering process by marking the order as \`DELIVERED\` through submitting another \`UpdateOrderStatus\` transaction:
+After `Manufacturer` accept the order, Retailer will update the customer order status by submit an `RetailerUpdateOrderStatus` transaction:
 
-```
-
+```javascript
 {
-
-"$class": "org.acme.vehicle_network.UpdateOrderStatus",
-
-"orderStatus": "DELIVERED",
-
-"order": "resource:org.acme.vehicle_network.Order#1234"
-
+  "$class": "org.acme.jewelry_network.RetailerUpdateOrderStatus",
+  "customerOrderStatus": "SCHEDULED_FOR_MANUFACTURE",
+  "customerOrder": "resource:org.acme.jewelry_network.CustomerOrder#TC201805070816"
 }
 ```
 
-This \`UpdateOrderStatus\` transaction updates the orderStatus of the \`Order\` with orderId 1234 in the asset registry and emits an \`UpdateOrderStatusEvent\` event.
+This `RetailerUpdateOrderStatus` transaction updates the CustomerOrderStatus of the `CustomerOrder` with orderId "TC201805070816" in the asset registry and emits an `RetailerUpdateOrderStatusEvent` event.
 
-This Business Network definition has been used to create demo applications that simulate the scenario outlined above. You can find more detail on these at https://github.com/hyperledger/composer-sample-applications/tree/master/packages/vehicle-manufacture
+When Manufacturer begin to collect and begin to make the jewelry, it will update the Retailer order status by submit an ``ManufacturerUpdateOrderStatus`` transaction:
 
-\## Permissions in this business network for modelled participants
+```javascript
+{
+  "$class": "org.acme.jewelry_network.ManufacturerUpdateOrderStatus",
+  "retailerOrderStatus": "MANUFACTURING",
+  "retailerOrder": "resource:org.acme.jewelry_network.RetailerOrder#NV201805078365"
+}
+```
 
-Within this network permissions are outlines for the participants outlining what they can and can't do. The rules in the permissions.acl file explicitly ALLOW participants to perform actions. Actions not written for a participant in that file are blocked.
+This `ManufacturerUpdateOrderStatus`updates the RetailerOrderStatus of the `RetailerOrder` with the orderId "NV201805078365" in the asset registry and emits an `` `ManufacturerUpdateOrderStatusEvent`` event.
 
-\### Regulator
+When Manufacturer finish the jewelry making precess, it will update the Retailer order status by submit an `ManufacturerUpdateOrderStatus` transaction:
 
-\`RegulatorAdminUser\` - Gives the regulator permission to perform ALL actions on ALL resources
+```javascript
+{
+  "$class": "org.acme.jewelry_network.ManufacturerUpdateOrderStatus",
+  "retailerOrderStatus": "JIN_ASSIGNED",
+  "retailerOrder": 	      			 "resource:org.acme.jewelry_network.RetailerOrder#NV201805078365",
+	"jin":"tcnv2018050705goldsa1",
+  "mineFieldId":"South Africa mine filed 1"
+}
+```
 
-\### Manufacturer
+This ``ManufacturerUpdateOrderStatus`` transaction updates the RetailerOrderStatus of the `RetailerOrder` with orderId "NV201805078365" in the asset registry, create a new `Jewelry` based of that \`RetailerOrder\` in the asset registry and emits an `ManufacturerUpdateOrderStatusEvent` event. At this stage as the jewelry does not have an owner assigned to it, its status is declared as "CERTIFICATION".
 
-\`ManufacturerUpdateOrder\` - Allows a manufacturer to UPDATE an Order asset's data only using an UpdateOrderStatus transaction. The manufacturer must also be specified as the \*vehicleDetails.make\* in the Order asset.
+After that, Manufacturer will delivier the jewelry to the retailer so that it will update the Retailer order status by submit an `ManufacturerUpdateOrderStatus` transaction:
 
-\`ManufacturerUpdateOrderStatus\` - Allows a manufacturer to CREATE and READ UpdateOrderStatus transactions that refer to an order that they are specified as the \*vehicleDetails.make\* in.
+```javascript
+{
+  "$class": "org.acme.jewelry_network.ManufacturerUpdateOrderStatus",
+  "retailerOrderStatus": "DELIVERED",
+  "retailerOrder": "resource:org.acme.jewelry_network.RetailerOrder#NV201805078365"
+}
+```
 
-\`ManufacturerReadOrder\` - Allows a manufacturer to READ an Order asset that they are specified as the \*vehicleDetails.make\* in.
+This `ManufacturerUpdateOrderStatus`updates the RetailerOrderStatus of the `RetailerOrder` with the orderId "NV201805078365" in the asset registry and emits an `` `ManufacturerUpdateOrderStatusEvent`` event.
 
-\`ManufacturerCreateVehicle\` - Allows a manufacturer to CREATE a vehicle asset only using a UpdateOrderStatus transaction. The transaction must have an \*orderStatus\* of VIN_ASSIGNED and the Order asset have the manufacturer specified as the \*vehicleDetails.make\*.
+After retailer receive the jewelry, it will update the customer order status by submit an `RetailerUpdateOrderStatus` transaction:
 
-\`ManufacturerReadVehicle\` - Allows a manufacturer to READ a Vehicle asset that they are specified as the \*vehicleDetails.make\* in.
+```javascript
+{
+  "$class": "org.acme.jewelry_network.RetailerUpdateOrderStatus",
+  "customerOrderStatus": "OWNER_ASSIGNED",
+  "customerOrder": "resource:org.acme.jewelry_network.CustomerOrder#TC201805070816",
+	"jin":"tcnv2018050705goldsa1"
+}
+```
 
-\### Person
+This ``RetailerUpdateOrderStatus`` transaction updates the CustomerOrderStatus of the `CustomerOrder` with orderId "TC201805070816" in the asset registry and emits an `ManufacturerUpdateOrderStatusEvent` event. At this stage as the jewelry will have an owner assigned to it, its status is declared as "SOLD\_TO\_CUSTOMER".
 
-\`PersonMakeOrder\` - Gives the person permission to CREATE an Order asset only using a PlaceOrder transaction. The person must also be specified as the \*orderer\* in the Order asset.
+Finally complete the ordering process by marking the customer order as \`DELIVERED\` through submitting another `RetailerUpdateOrderStatus` transaction:
 
-\`PersonPlaceOrder\` - Gives the person permission to CREATE and READ PlaceOrder transactions that refer to an order that they are specified as \*orderer\* in.
+```javascript
+{
+  "$class": "org.acme.jewelry_network.RetailerUpdateOrderStatus",
+  "customerOrderStatus": "DELIVERED",
+  "customerOrder": "resource:org.acme.jewelry_network.CustomerOrder#TC201805070816"
+}
+```
 
-\`PersonReadOrder\` - Gives the person permission to READ an Order asset that they are specified as the \*orderer\* in.
+This `RetailerUpdateOrderStatus`  transaction updates the orderStatus of the `CustomerOrder` with customerOrderId "TC201805070816" in the asset registry and emits an `RetailerUpdateOrderStatusEvent` event.
 
-
+This Business Network definition has been used to create demo applications that simulate the scenario outlined above. You can find more detail on these at 
