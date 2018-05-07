@@ -5,7 +5,7 @@
  */
 async function customerPlaceOrder(orderRequest){
     console.log('customerPlaceOrder');
-
+	console.log(orderRequest);
     const factory = getFactory();
     const namespace = 'org.acme.jewelry_network';
 
@@ -39,7 +39,7 @@ async function retailerUpdateOrderStatus(updateOrderRequest){
 
     // get jewelry registry
     const jewelryRegistry = await getAssetRegistry(namespace+'.Jewelry');
-    if (updateOrderRequest.orderStatus === 'OWNER_ASSIGNED') {
+    if (updateOrderRequest.customerOrderStatus === 'OWNER_ASSIGNED') {
         if (!updateOrderRequest.jin) {
             throw new Error('Value for JIN was expected');
         }
@@ -72,17 +72,18 @@ async function retailerUpdateOrderStatus(updateOrderRequest){
  */
 async function retailerPlaceOrder(orderRequest){
     console.log('retailerPlaceOrder');
+  	console.log(orderRequest);
 
     const factory = getFactory();
     const namespace = 'org.acme.jewelry_network';
 
-    const retailerOrder = factory.newResource(namespace, 'RetailerOrder', orderRequet.retailerOrderId);
-    retailerOrder.jewelryDetail = orderRequet.jewelryDetail;
+    const retailerOrder = factory.newResource(namespace, 'RetailerOrder', orderRequest.retailerOrderId);
+    retailerOrder.jewelryDetail = orderRequest.jewelryDetail;
     retailerOrder.retailerOrderStatus = 'PLACED';
     retailerOrder.retailer = factory.newRelationship(namespace, 'Company',orderRequest.retailer.getIdentifier());
 
     // save the retailer order
-    const assetRegistry = await getAssetRegistry(customerOrder.getFullyQualifiedType());
+    const assetRegistry = await getAssetRegistry(retailerOrder.getFullyQualifiedType());
     await assetRegistry.add(retailerOrder);
 
     // emit the event

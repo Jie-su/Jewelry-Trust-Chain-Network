@@ -66,12 +66,12 @@ event CustomerPlaceOrderEvent {
 transaction RetailerUpdateOrderStatus {
   o CustomerOrderStatus customerOrderStatus
   o String jin optional
-  --> CustomerOrder customerorder
+  --> CustomerOrder customerOrder
 }
 
 event RetailerUpdateOrderStatusEvent {
   o CustomerOrderStatus customerOrderStatus
-  o CustomerOrder customerorder
+  o CustomerOrder customerOrder
 }
 
 // MANUFACTURE DEFINITIONS
@@ -93,12 +93,12 @@ asset RetailerOrder identified by retailerOrderId {
 }
 
 transaction RetailerPlaceOrder {
-  o String retailerOrderID
+  o String retailerOrderId
   o JewelryDetail jewelryDetail
   --> Company retailer
 }
 
-event retailerPlaceOrderEvent {
+event RetailerPlaceOrderEvent {
   o String retailerOrderId
   o JewelryDetail jewelryDetail
   --> Company retailer
@@ -107,11 +107,12 @@ event retailerPlaceOrderEvent {
 transaction ManufacturerUpdateOrderStatus {
   o RetailerOrderStatus retailerOrderStatus
   o String mineFieldId optional
+  o String jin optional
   --> RetailerOrder retailerOrder
 }
 
 event ManufacturerUpdateOrderStatusEvent{
-  o RetailerOrderStatus retailorderStatus
+  o RetailerOrderStatus retailerOrderStatus
   o RetailerOrder retailerOrder
 }
 
