@@ -7,6 +7,7 @@ namespace org.acme.jewelry_network
 
 concept JewelryDetail {
   -->  Manufacturer make
+  --> Retailer sell
   //Model Type: Ring, Necklace, Bracelet
   o String ModelType
   //DiamondWeight: 0.5 ct, 1 ct ..ect
@@ -25,9 +26,9 @@ abstract participant Company identified by companyID{
 participant Person identified by username {
   //Base definition of the person
   o String username
-  o String phoneNumber 
-  o String email
-  o String address
+  o String phoneNumber optional
+  o String email optional
+  o String address optional
 }
 
 // Retailer DEFINITIONS
@@ -121,7 +122,6 @@ participant Regulator extends Company{
 enum JewelryStatus {
   o CERTIFICATION
   o SOLD_TO_CUSTOMER
-  // o ACTIVE
   o STOLEN
 }
 

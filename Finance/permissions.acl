@@ -1,0 +1,51 @@
+rule CustomerMakeOrder {
+    description: "Allow Persons to create and view orders"
+    participant(p): "org.acme.jewelry_network.Person"
+    operation: CREATE
+    resource(o): "org.acme.jewelry_network.CustomerOrder"
+    transaction(tx): "org.acme.jewelry_network.CustomerPlaceOrder"
+    condition: (o.customer.getIdentifier() == p.getIdentifier())
+    action: ALLOW
+}
+
+rule CustomerPlaceOrder {
+    description: "Allow Persons to place orders and view they've done this"
+    participant(p): "org.acme.jewelry_network.Person"
+    operation: CREATE, READ
+    resource(o): "org.acme.jewelry_network.CustomerPlaceOrder"
+    condition: (o.customer.getIdentifier() == p.getIdentifier())
+    action: ALLOW
+}
+
+rule CustomerReadOrder {
+    description: "Allow Persons to place orders and view they've done this"
+    participant(p): "org.acme.jewelry_network.Person"
+    operation: READ
+    resource(o): "org.acme.jewelry_network.CustomerOrder"
+    condition: (o.customer.getIdentifier() == p.getIdentifier())
+    action: ALLOW
+}
+
+rule NetworkAdminUser {
+    description: "Grant business network administrators full access to user resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "**"
+    action: ALLOW
+}
+
+rule RegulatorAdminUser {
+    description: "Let the regulator do anything"
+    participant: "org.acme.jewelry_network.Regulator"
+    operation: ALL
+    resource: "**"
+    action: ALLOW
+}
+
+rule System {
+    description: "Grant all full access to system resources"
+    participant: "org.**"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
