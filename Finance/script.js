@@ -148,7 +148,8 @@ async function setupDemo(){
 
     let customer = ['Ricard','Jason','Bin','Alice','Amo','Vivian','Dexter','Poppy','Ryan','Lance','Takuya','Fay','Douglas','Autumn'];
     let retailers;
-    let manufacturers;
+    let manufacturers = ['Nova','Saber','Archer'];
+ 
 
     const jewelry = {
         'Tiffany & Co.':{
@@ -260,12 +261,13 @@ async function setupDemo(){
         return retailerResource;
     });
 
-    // create array of Manufacturer particpant resources identified by the top level keys in jewelry const
-    manufacturers = Object.keys(retailers).map(function (manufacturer) {
-        const manufacturerResource  = factory.newResource(namespace,'Manufacturer',manufacturer);
-        manufacturerResource.companyName = manufacturer;
-        return manufacturerResource;
-    });
+	for(var manufacturer in manufacturers){
+    	const manufacturerResource  = factory.newResource(namespace,'Manufacturer',manufacturers[manufacturer]);
+        manufacturerResource.companyName = manufacturers[manufacturer];
+         // add the manufacturers
+        const manufacturerRegistry = await getParticipantRegistry(namespace + '.Manufacturer');
+        await manufacturerRegistry.add(manufacturerResource);
+    }
 
     // create a Regulator participant resource
     const regulator = factory.newResource(namespace, 'Regulator', 'JDA');
@@ -278,10 +280,6 @@ async function setupDemo(){
     //add the retailers
     const retailerRegistry = await getParticipantRegistry(namespace + '.Retailer');
     await retailerRegistry.addAll(retailers);
-
-    // add the manufacturers
-    const manufacturerRegistry = await getParticipantRegistry(namespace + '.Manufacturer');
-    await manufacturerRegistry.addAll(manufacturers);
 
     // add the person
     const personRegistry = await getParticipantRegistry(namespace + '.Person');
