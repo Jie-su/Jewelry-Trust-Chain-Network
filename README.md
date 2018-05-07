@@ -1,6 +1,6 @@
 # Jewelry Trust Chain Network
 
-> This network tracks the manufacture of jewelry from an initial order request through to their completion by the manufacturer. A regulator is able to provide oversight throughout this whole process.
+> This network tracks the manufacture of jewelry from an initial order request through to their completion by the retailer and manufacturer. A regulator is able to provide oversight throughout this whole process.
 
 ## Models within this business network
 
@@ -22,7 +22,7 @@
 
 ## Example use of this business network
 
-
+A `Person`uses a retailer's application to order their desired jewelry. The application submits a`CustomerPlaceOrder` transaction which creates a new`CustomerOrder`asset containing the details of the jewelry the `Person` wishes to have made for them. The `Retailer`receives the `CustomerOrder` and submits a `RetailerPlaceOrder` transaction which creates a new `RetailerOrder` asset containing the details of the jewelry the `Person` wishes to have made for them. The `Retailer`also submits `RetailerUpdateOrderStatus`transaction to mark the changes of the `CustomerOrder`from "PLACED" to "SCHEDULED\_FOR\_MANUFACTURE". The `Manufacturer` begins work on the jewelry and as it proceeds through stages of production the `Manufacturer` submits `ManufacturerUpdateOrderStatus` transactions to mark the change in status for the `RetailerOrder` e.g. updating the status from "PLACED" to "MANUFACTURING". Once the `Manufacturer` has completed production for the `RetailerOrder` they register the jewelry by submitting a `ManufacturerUpdateOrderStatus` transaction with the status "JIN_ASSIGNED" (also providing the "jin" and "mineFieldId" to register against) and a `Jewelry` asset is formally added to the registry using the details specified in the `RetailerOrder` . Once the jewelry is registered and delivered to the `Retailer` then the `Manufacturer` submits an `UpdateOrderStatus`transaction with a status of "DELIVERED". The `Retailer` submits a `retailerUpdateOrderStatus` transaction with the status "OWNER_ASSIGNED" at which point the customer field of the `Jewelry` is set to match the customer field of the `CustomerOrder` . The regulator would perform oversight over this whole process.
 
 ## Testing this network within playground
 
@@ -179,4 +179,6 @@ Finally complete the ordering process by marking the customer order as \`DELIVER
 
 This `RetailerUpdateOrderStatus`  transaction updates the orderStatus of the `CustomerOrder` with customerOrderId "TC201805070816" in the asset registry and emits an `RetailerUpdateOrderStatusEvent` event.
 
-This Business Network definition has been used to create demo applications that simulate the scenario outlined above. You can find more detail on these at 
+This Business Network definition has been used to create demo applications that simulate the scenario outlined above. You can find more detail on these at [Github](https://github.com/Jie-su/COMP6212)
+
+
