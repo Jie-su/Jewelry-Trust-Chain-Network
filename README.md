@@ -132,9 +132,9 @@ When Manufacturer finish the jewelry making precess, it will update the Retailer
 
 ```javascript
 {
-  "$class": "org.acme.jewelry_network.ManufacturerUpdateOrderStatus",
+  "$class":"org.acme.jewelry_network.ManufacturerUpdateOrderStatus",
   "retailerOrderStatus": "JIN_ASSIGNED",
-  "retailerOrder":                        "resource:org.acme.jewelry_network.RetailerOrder#NV201805078365",
+  "retailerOrder":"resource:org.acme.jewelry_network.RetailerOrder#NV201805078365",
     "jin":"tcnv2018050705goldsa1",
   "mineFieldId":"South Africa mine filed 1"
 }
@@ -146,9 +146,9 @@ After that, Manufacturer will delivier the jewelry to the retailer so that it wi
 
 ```javascript
 {
-  "$class": "org.acme.jewelry_network.ManufacturerUpdateOrderStatus",
-  "retailerOrderStatus": "DELIVERED",
-  "retailerOrder": "resource:org.acme.jewelry_network.RetailerOrder#NV201805078365"
+  "$class":"org.acme.jewelry_network.ManufacturerUpdateOrderStatus",
+  "retailerOrderStatus":"DELIVERED",
+  "retailerOrder":"resource:org.acme.jewelry_network.RetailerOrder#NV201805078365"
 }
 ```
 
@@ -158,9 +158,9 @@ After retailer receive the jewelry, it will update the customer order status by 
 
 ```javascript
 {
-  "$class": "org.acme.jewelry_network.RetailerUpdateOrderStatus",
-  "customerOrderStatus": "OWNER_ASSIGNED",
-  "customerOrder": "resource:org.acme.jewelry_network.CustomerOrder#TC201805070816",
+  "$class":"org.acme.jewelry_network.RetailerUpdateOrderStatus",
+  "customerOrderStatus":"OWNER_ASSIGNED",
+  "customerOrder":"resource:org.acme.jewelry_network.CustomerOrder#TC201805070816",
     "jin":"tcnv2018050705goldsa1"
 }
 ```
@@ -171,9 +171,9 @@ Finally complete the ordering process by marking the customer order as \`DELIVER
 
 ```javascript
 {
-  "$class": "org.acme.jewelry_network.RetailerUpdateOrderStatus",
-  "customerOrderStatus": "DELIVERED",
-  "customerOrder": "resource:org.acme.jewelry_network.CustomerOrder#TC201805070816"
+  "$class":"org.acme.jewelry_network.RetailerUpdateOrderStatus",
+  "customerOrderStatus":"DELIVERED",
+  "customerOrder":"resource:org.acme.jewelry_network.CustomerOrder#TC201805070816"
 }
 ```
 
