@@ -70,14 +70,12 @@ This ``RetailerUpdateOrderStatus`` transaction updates the CustomerOrderStatus o
 
 Then, the retailer will place an RetailerOrder to the Manufacturer by submit a RetailerPlaceOrder transacation: 
 
+ 
+
 ```javascript
 {
   "$class": "org.acme.jewelry_network.RetailerPlaceOrder",
-  "retailerOrderId": "{
-  "$class": "org.acme.jewelry_network.ManufacturerUpdateOrderStatus",
-  "retailerOrderStatus": "MANUFACTURING",
-  "retailerOrder": "resource:org.acme.jewelry_network.RetailerOrder#NV201805078365"
-}",
+  "retailerOrderId": "NV201805078365",
   "jewelryDetail": {
     "$class": "org.acme.jewelry_network.JewelryDetail",
     "make": "resource:org.acme.jewelry_network.Manufacturer#Nova",
