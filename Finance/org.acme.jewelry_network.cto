@@ -47,7 +47,6 @@ asset CustomerOrder identified by customerOrderId {
   o String customerOrderId
   o JewelryDetail jewelryDetail
   o CustomerOrderStatus customerOrderStatus
-  //不懂
   --> Person customer
 }
 

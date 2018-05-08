@@ -150,7 +150,7 @@ After that, Manufacturer will delivier the jewelry to the retailer so that it wi
 }
 ```
 
-This `ManufacturerUpdateOrderStatus`updates the RetailerOrderStatus of the `RetailerOrder` with the orderId "NV201805078365" in the asset registry and emits an `` `ManufacturerUpdateOrderStatusEvent`` event.
+This `ManufacturerUpdateOrderStatus`updates the RetailerOrderStatus of the `RetailerOrder` with the orderId "NV201805078365" in the asset registry and emits an `` ManufacturerUpdateOrderStatusEvent`` event.
 
 After retailer receive the jewelry, it will update the customer order status by submit an `RetailerUpdateOrderStatus` transaction:
 
@@ -178,3 +178,41 @@ Finally complete the ordering process by marking the customer order as \`DELIVER
 This `RetailerUpdateOrderStatus`  transaction updates the orderStatus of the `CustomerOrder` with customerOrderId "TC201805070816" in the asset registry and emits an `RetailerUpdateOrderStatusEvent` event.
 
 This Business Network definition has been used to create demo applications that simulate the scenario outlined above. You can find more detail on these at [Github](https://github.com/Jie-su/COMP6212)
+
+## Permissions in this business network for modelled participants
+
+Within this network permissions are outlines for the participants outlining what they can and can't do. The rules in the permissions.acl file explicitly ALLOW participants to perform actions. Actions not written for a participant in that file are blocked.
+
+### Regulator
+
+`RegulatorAdminUser` \- Gives the regulator permission to perform ALL actions on ALL resources
+
+### Retailer
+
+`RetailerUpdateOrder` \- Allows a retailer to UPDATE a CustomerOrder asset's data only using a RetailerUpdateOrderStatus transaction. The retailer must also be specified as the _jewelryDetail.sell_ in the CustomerOrder asset.
+
+`RetailerUpdateOrderStatus` \- Allows a retailer to CREATE and READ RetailerUpdateOrderStatus transactions that refer to a customerOrder that they are specified as the _jewelryDetail.sell_ in.
+
+`RetailerReadOrder` - Allows a retailer to READ a CustomerOrder asset that they are specified as the *jewelryDetail.sell*  in.
+
+`RetailerReadJewelries` - Allows a retailer to READ a Jewelry asset that they are specified as the _jewelryDetail.sell_ in.
+
+### Manufacturer
+
+`ManufacturerUpdateOrder` \- Allows a manufacturer to UPDATE a RetailerOrder asset's data only using a ManufacturerUpdateOrderStatus transaction. The manufacturer must also be specified as the _jewelryDetail.make_ in the RetailerOrder asset.
+
+`ManufacturerUpdateOrderStatus` \- Allows a manufacturer to CREATE and READ ManufacturerUpdateOrderStatus transactions that refer to a retailerOrder that they are specified as the _jewelryDetail.make_ in.
+
+`ManufacturerReadOrder` \- Allows a manufacturer to READ a RetailerOrder asset that they are specified as the _jewelryDetail.make_ in.
+
+`ManufacturerCreateJewelries` \- Allows a manufacturer to CREATE a jewelry asset only using a ManufacturerUpdateOrderStatus transaction. The transaction must have a _retailerOrderStatus_ of JIN_ASSIGNED and the RetailerOrder asset have the manufacturer specified as the _jewelryDetail.make_.
+
+`ManufacturerReadJewelries` \- Allows a manufacturer to READ a Jewelry asset that they are specified as the _jewelryDetail.make_ in.
+
+### Person
+
+`CustomerMakeOrder` \- Gives the person permission to CREATE a CustomerOrder asset only using a CustomerPlaceOrder transaction. The person must also be specified as the _customer_ in the CustomerOrder asset.
+
+`CustomerPlaceOrder` \- Gives the person permission to CREATE and READ CustomerPlaceOrder transactions that refer to a customerOrder that they are specified as _customer_ in.
+
+`CustomerReadOrder` \- Gives the person permission to READ a CustomerOrder asset that they are specified as the _customer_ in.
