@@ -6,8 +6,9 @@ namespace org.acme.jewelry_network
 // BASE DEFINTIONS
 
 concept JewelryDetail {
-  -->  Manufacturer make
-  --> Retailer sell
+  //--> Minefield mine optional
+  //--> Manufacturer make optional
+  //--> Retailer sell optional
   //Model Type: Ring, Necklace, Bracelet
   o String ModelType
   //DiamondWeight: 0.5 ct, 1 ct ..ect
@@ -21,6 +22,15 @@ abstract participant Company identified by companyID{
   //Can be set to retailer, Manufacturer, Regulator
   o String companyID
   o String companyName
+  o String publicKey //-------------------------------------------------
+}
+
+abstract participant Company_2 identified by companyID{
+  //Base defintion of a company
+  //Can be set to retailer, Manufacturer, Regulator
+  o String companyID
+  o String companyName
+  o String publicKey //-------------------------------------------------
 }
 
 participant Person identified by username {
@@ -45,14 +55,17 @@ enum CustomerOrderStatus {
 
 asset CustomerOrder identified by customerOrderId {
   o String customerOrderId
+  //o String customerPublickey
   o JewelryDetail jewelryDetail
   o CustomerOrderStatus customerOrderStatus
   --> Person customer
 }
 
 transaction CustomerPlaceOrder {
-  o String customerOrderId
+  o String customerOrderId optional
+  //--> Retailer Cus_Retai
   o JewelryDetail jewelryDetail
+  --> Retailer sell
   --> Person customer
 }
 
@@ -65,6 +78,8 @@ event CustomerPlaceOrderEvent {
 transaction RetailerUpdateOrderStatus {
   o CustomerOrderStatus customerOrderStatus
   o String jin optional
+  o String retailerId optional 
+  o String retailerSign optional
   --> CustomerOrder customerOrder
 }
 
@@ -74,7 +89,7 @@ event RetailerUpdateOrderStatusEvent {
 }
 
 // MANUFACTURE DEFINITIONS
-participant Manufacturer extends Company{
+participant Manufacturer extends Company_2{
 }
 
 enum RetailerOrderStatus {
@@ -86,14 +101,17 @@ enum RetailerOrderStatus {
 
 asset RetailerOrder identified by retailerOrderId {
   o String retailerOrderId
+  //o String customerPublickey
   o JewelryDetail jewelryDetail
   o RetailerOrderStatus retailerOrderStatus
   --> Company retailer
 }
 
 transaction RetailerPlaceOrder {
-  o String retailerOrderId
+  o String retailerOrderId optional
+  //--> Manufacturer Retai_Manu
   o JewelryDetail jewelryDetail
+  --> Manufacturer make
   --> Company retailer
 }
 
@@ -105,14 +123,64 @@ event RetailerPlaceOrderEvent {
 
 transaction ManufacturerUpdateOrderStatus {
   o RetailerOrderStatus retailerOrderStatus
-  o String mineFieldId optional
+  //o String mineFieldId optional
   o String jin optional
+  o String manufacturerId optional
+  o String manufacturerSign optional
   --> RetailerOrder retailerOrder
 }
 
 event ManufacturerUpdateOrderStatusEvent{
   o RetailerOrderStatus retailerOrderStatus
   o RetailerOrder retailerOrder
+}
+
+
+// MINEFIELD DEFINITIONS
+participant Minefield extends Company{
+}
+
+enum ManufacturerOrderStatus {
+  o PLACED
+  o MANUFACTURING
+  o MINING
+  o JIN_ASSIGNED
+  o DELIVERED
+}
+
+asset ManufacturerOrder identified by manufacturerOrderId {
+  o String manufacturerOrderId
+  //o String retailerPublickey
+  o JewelryDetail jewelryDetail
+  o ManufacturerOrderStatus manufacturerOrderStatus
+  --> Company_2 manufacturer
+}
+
+transaction ManufacturerPlaceOrder {   //----------------------------------------
+  o String manufacturerOrderId optional
+  //--> Minefield Manu_Mine
+  o JewelryDetail jewelryDetail
+  --> Minefield mine
+  -->  Company_2 manufacturer
+}
+
+event ManufacturerPlaceOrderEvent {
+  o String manufacturerOrderId
+  o JewelryDetail jewelryDetail
+  -->  Company_2 manufacturer
+}
+
+transaction MinefieldUpdateOrderStatus {  //----------------------------------------
+  o ManufacturerOrderStatus manufacturerOrderStatus
+  o String mineFieldId 
+  o String jin optional
+  o String mineFieldSign optional
+  --> ManufacturerOrder manufacturerOrder
+}
+
+event MinefieldUpdateOrderStatusEvent{
+  o ManufacturerOrderStatus manufacturerOrderStatus
+  o ManufacturerOrder manufacturerOrder
 }
 
 // REGULATOR DEFINITIONS
@@ -127,11 +195,17 @@ enum JewelryStatus {
 
 asset Jewelry identified by jin {
   o String jin
-  o String mineFieldId
-  o JewelryDetail jewelryDetail
-  o JewelryStatus jewelryStatus
+  o String mineFieldId  optional//----------------------------------------
+  o String mineFieldSign optional//----------------------------------------
+  o String manufacturerId  optional//----------------------------------------
+  o String manufacturerSign optional//----------------------------------------
+  o String retailerId  optional//----------------------------------------
+  o String retailerSign  optional//----------------------------------------
+  o JewelryDetail jewelryDetail optional
+  o JewelryStatus jewelryStatus optional
   --> Person owner optional
 }
 
+// SETUP FEMO
 transaction SetupDemo {
 }

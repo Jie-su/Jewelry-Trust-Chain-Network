@@ -1,3 +1,4 @@
+// rules about the customers 
 rule CustomerMakeOrder {
     description: "Allow Persons to create and view orders"
     participant(p): "org.acme.jewelry_network.Person"
@@ -25,6 +26,156 @@ rule CustomerReadOrder {
     condition: (o.customer.getIdentifier() == p.getIdentifier())
     action: ALLOW
 }
+
+// rules about the retailers 
+rule RetailerUpdateOrder {
+    description: "Allow retailers to view and update their own orders"
+    participant(m): "org.acme.jewelry_network.Retailer"
+    operation: UPDATE
+    resource(o): "org.acme.jewelry_network.CustomerOrder"
+    transaction(tx): "org.acme.jewelry_network.RetailerUpdateOrderStatus"
+    condition: (o.jewelryDetail.sell.getIdentifier() == m.getIdentifier())
+    action: ALLOW
+}
+
+rule RetailerUpdateOrderStatus {
+    description: "Allow retailers to update customerOrder statuses and view they've done this"
+    participant(m): "org.acme.jewelry_network.Retailer"
+    operation: CREATE, READ
+    resource(o): "org.acme.jewelry_network.RetailerUpdateOrderStatus"
+    condition: (o.customerOrder.jewelryDetail.sell.getIdentifier() == m.getIdentifier())
+    action: ALLOW
+}
+
+rule RetailerReadOrder {
+    description: "Allow retailers to view and update their own orders"
+    participant(m): "org.acme.jewelry_network.Retailer"
+    operation: READ
+    resource(o): "org.acme.jewelry_network.CustomerOrder"
+    condition: (o.jewelryDetail.sell.getIdentifier() == m.getIdentifier())
+    action: ALLOW
+}
+
+rule RetailerReadJewelries {
+    description: "Allow manufacturers to create and view their jewelries"
+    participant(m): "org.acme.jewelry_network.Retailer"
+    operation: READ
+    resource(v): "org.acme.jewelry_network.Jewelry"
+    condition: (v.jewelryDetail.sell.getIdentifier() == m.getIdentifier())
+    action: ALLOW
+}
+
+
+
+// rules about the manufacturers
+rule ManufacturerUpdateOrder {
+    description: "Allow manufacturers to view and update their own orders"
+    participant(m): "org.acme.jewelry_network.Manufacturer"
+    operation: UPDATE
+    resource(o): "org.acme.jewelry_network.RetailerOrder"
+    transaction(tx): "org.acme.jewelry_network.ManufacturerUpdateOrderStatus"
+    condition: (o.jewelryDetail.make.getIdentifier() == m.getIdentifier())
+    action: ALLOW
+}
+
+rule ManufacturerUpdateOrderStatus {
+    description: "Allow manufacturers to update retailerOrder statuses and view they've done this"
+    participant(m): "org.acme.jewelry_network.Manufacturer"
+    operation: CREATE, READ
+    resource(o): "org.acme.jewelry_network.ManufacturerUpdateOrderStatus"
+    condition: (o.retailerOrder.jewelryDetail.make.getIdentifier() == m.getIdentifier())
+    action: ALLOW
+}
+
+rule ManufacturerReadOrder {
+    description: "Allow manufacturers to view and update their own orders"
+    participant(m): "org.acme.jewelry_network.Manufacturer"
+    operation: READ
+    resource(o): "org.acme.jewelry_network.RetailerOrder"
+    condition: (o.jewelryDetail.make.getIdentifier() == m.getIdentifier())
+    action: ALLOW
+}
+
+rule ManufacturerCreateJewelries {
+    description: "Allow manufacturers to create and view their jewelries"
+    participant(m): "org.acme.jewelry_network.Manufacturer"
+    operation: CREATE
+    resource(v): "org.acme.jewelry_network.Jewelry"
+    transaction(tx): "org.acme.jewelry_network.ManufacturerUpdateOrderStatus"
+    condition: (v.jewelryDetail.make.getIdentifier() == m.getIdentifier() && tx.retailerOrderStatus == "JIN_ASSIGNED")
+    action: ALLOW
+}
+
+rule ManufacturerReadJewelries {
+    description: "Allow manufacturers to create and view their jewelries"
+    participant(m): "org.acme.jewelry_network.Manufacturer"
+    operation: READ
+    resource(v): "org.acme.jewelry_network.Jewelry"
+    condition: (v.jewelryDetail.make.getIdentifier() == m.getIdentifier())
+    action: ALLOW
+}
+//   vision permerssion
+rule PersonSeeRetailers {
+    description: "Allow person see all the information about all the retailers"
+    participant: "org.acme.jewelry_network.Person"
+    operation: READ
+    resource: "org.acme.jewelry_network.Retailer"
+    action: ALLOW
+}
+
+rule PersonSeeManufacturer {
+    description: "Allow person see all the information about all the manufacturers"
+    participant: "org.acme.jewelry_network.Person"
+    operation: READ
+    resource: "org.acme.jewelry_network.Manufacturer"
+    action: ALLOW
+}
+
+rule PersonSeeMinefield {
+    description: "Allow person see all the information about all the Minefield"
+    participant: "org.acme.jewelry_network.Person"
+    operation: READ
+    resource: "org.acme.jewelry_network.Minefield"
+    action: ALLOW
+}
+rule RetailerSeeMinefield {
+    description: "Allow retailer see all the information about all the Minefield"
+    participant: "org.acme.jewelry_network.Retailer"
+    operation: READ
+    resource: "org.acme.jewelry_network.Minefield"
+    action: ALLOW
+}
+
+rule RetailerSeeManufacturer {
+    description: "Allow retailer see all the information about all the Manufacturers"
+    participant: "org.acme.jewelry_network.Retailer"
+    operation: READ
+    resource: "org.acme.jewelry_network.Manufacturer"
+    action: ALLOW
+}
+
+rule ManufacturerSeeMinefield {
+    description: "Allow manufacturer see all the information about all the Minefield"
+    participant: "org.acme.jewelry_network.Manufacturer"
+    operation: READ
+    resource: "org.acme.jewelry_network.Minefield"
+    action: ALLOW
+}
+
+
+
+
+
+// rules for others, including systems
+rule ParticipantsSeeSelves {
+    description: "Let participants see themselves"
+    participant(p): "org.hyperledger.composer.system.Participant"
+    operation: ALL
+    resource(r): "org.hyperledger.composer.system.Participant"
+    condition: (r.getIdentifier() == p.getIdentifier())
+    action: ALLOW
+}
+
 
 rule NetworkAdminUser {
     description: "Grant business network administrators full access to user resources"
