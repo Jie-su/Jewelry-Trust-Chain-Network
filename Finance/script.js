@@ -41,7 +41,6 @@ async function jewelryUpdateStatus(updateOrderRequest){
 
     const jewelryRegistry = await getAssetRegistry(namespace+'.Jewelry');
     const jewelry = await jewelryRegistry.get(updateOrderRequest.jewelry.jin);
-    console.log(updateOrderRequest.owner);
     jewelry.owner = factory.newRelationship(namespace, 'Person', updateOrderRequest.owner);
     // const jewelryResigstry = await getAssetRegistry(namespace + '.Jewelry');
     await jewelryRegistry.update(jewelry);
