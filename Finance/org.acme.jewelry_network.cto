@@ -183,6 +183,7 @@ event MinefieldUpdateOrderStatusEvent{
   o ManufacturerOrder manufacturerOrder
 }
 
+
 // REGULATOR DEFINITIONS
 participant Regulator extends Company{
 }
@@ -204,4 +205,13 @@ asset Jewelry identified by jin {
   o JewelryDetail jewelryDetail optional
   o JewelryStatus jewelryStatus optional
   --> Person owner optional
+}
+
+transaction JewelryUpdateStatus {  //----------------------------------------
+  o String owner
+  --> Jewelry jewelry
+}
+
+event JewelryUpdateStatusEvent{
+  o Jewelry jewelry
 }

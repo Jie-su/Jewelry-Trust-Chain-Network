@@ -29,6 +29,31 @@ async function customerPlaceOrder(orderRequest){
 }
 
 /**
+ * Customer place an order from the retailer for a jewelry
+ * @param {org.acme.jewelry_network.JewelryUpdateStatus} jewelryUpdateStatus - the customerPlaceOrder transaction
+ * @transaction
+ */
+async function jewelryUpdateStatus(updateOrderRequest){
+    console.log('jewelryUpdateStatus');
+
+    const factory = getFactory();
+    const namespace = 'org.acme.jewelry_network';
+
+    const jewelryRegistry = await getAssetRegistry(namespace+'.Jewelry');
+    const jewelry = await jewelryRegistry.get(updateOrderRequest.jewelry.jin);
+    console.log(updateOrderRequest.owner);
+    jewelry.owner = factory.newRelationship(namespace, 'Person', updateOrderRequest.owner);
+    // const jewelryResigstry = await getAssetRegistry(namespace + '.Jewelry');
+    await jewelryRegistry.update(jewelry);
+
+    // emit the event
+    const jewelryUpdateStatusEvent = factory.newEvent(namespace, 'JewelryUpdateStatusEvent');
+    jewelryUpdateStatusEvent.jewelry=updateOrderRequest.jewelry;
+    emit(jewelryUpdateStatusEvent);
+}
+
+
+/**
  * Retailer updates the status of a customerOrder
  * @param {org.acme.jewelry_network.RetailerUpdateOrderStatus} retailerUpdateOrderStatus - the RetailerUpdateOrderStatus transaction
  * @transaction
