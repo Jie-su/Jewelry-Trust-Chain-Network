@@ -8,7 +8,9 @@ async function customerPlaceOrder(orderRequest){
 	console.log(orderRequest);
     const factory = getFactory();
     const namespace = 'org.acme.jewelry_network';
-
+  	
+	var timestamp =new Date();
+  	orderRequest.customerOrderId = orderRequest.sell.getIdentifier()+(timestamp.getTime());
     const customerOrder = factory.newResource(namespace, 'CustomerOrder', orderRequest.customerOrderId);
     customerOrder.jewelryDetail = orderRequest.jewelryDetail;
     customerOrder.customerOrderStatus = 'PLACED';
@@ -43,10 +45,18 @@ async function retailerUpdateOrderStatus(updateOrderRequest){
         if (!updateOrderRequest.jin) {
             throw new Error('Value for JIN was expected');
         }
+        if (!updateOrderRequest.retailerId) { //--√
+            throw new Error('Value for retailerId was expected');
+        }
+        if (!updateOrderRequest.retailerSign) { //--√
+            throw new Error('Value for retailerSign was expected');
+        }
 
         // assign the owner of the jewelry to be the person who palced the order
         const jewelry = await jewelryRegistry.get(updateOrderRequest.jin);
         jewelry.jewelryStatus = 'SOLD_TO_CUSTOMER';
+        jewelry.retailerId = updateOrderRequest.retailerId; //--√
+        jewelry.retailerSign = updateOrderRequest.retailerSign; //--√
         jewelry.owner = factory.newRelationship(namespace, 'Person', updateOrderRequest.customerOrder.customer.username);
         await jewelryRegistry.update(jewelry);
     }
@@ -77,10 +87,14 @@ async function retailerPlaceOrder(orderRequest){
     const factory = getFactory();
     const namespace = 'org.acme.jewelry_network';
 
+  	var timestamp =new Date();
+  	orderRequest.retailerOrderId = orderRequest.make.getIdentifier()+(timestamp.getTime());
     const retailerOrder = factory.newResource(namespace, 'RetailerOrder', orderRequest.retailerOrderId);
     retailerOrder.jewelryDetail = orderRequest.jewelryDetail;
     retailerOrder.retailerOrderStatus = 'PLACED';
-    retailerOrder.retailer = factory.newRelationship(namespace, 'Company',orderRequest.retailer.getIdentifier());
+    //retailerOrder.retailer = factory.newRelationship(namespace, 'Company',orderRequest.retailer.getIdentifier());
+    retailerOrder.retailer = factory.newRelationship(namespace, 'Retailer',orderRequest.retailer.getIdentifier());
+
 
     // save the retailer order
     const assetRegistry = await getAssetRegistry(retailerOrder.getFullyQualifiedType());
@@ -92,6 +106,40 @@ async function retailerPlaceOrder(orderRequest){
     retailerPlaceOrderEvent.jewelryDetail = retailerOrder.jewelryDetail;
     retailerPlaceOrderEvent.retailer = retailerOrder.retailer;
     emit(retailerPlaceOrderEvent);
+}
+
+//-----------------------------------------------------------------------------------------add transaction of manufacturer place order
+
+/**
+ * Manufacturer places an order from the minefield for a jewelry
+ * @param {org.acme.jewelry_network.ManufacturerPlaceOrder} manufacturerPlaceOrder - the ManufacturerPlaceOrder transaction
+ * @transaction
+ */
+async function manufacturerPlaceOrder(orderRequest){
+    console.log('manufacturerPlaceOrder');
+  	console.log(orderRequest);
+
+    const factory = getFactory();
+    const namespace = 'org.acme.jewelry_network';
+
+  	var timestamp =new Date();
+  	orderRequest.manufacturerOrderId = orderRequest.mine.getIdentifier()+(timestamp.getTime());
+    const manufacturerOrder = factory.newResource(namespace, 'ManufacturerOrder', orderRequest.manufacturerOrderId);
+    manufacturerOrder.jewelryDetail = orderRequest.jewelryDetail;
+    manufacturerOrder.manufacturerOrderStatus = 'PLACED';
+    //manufacturerOrder.manufacturer = factory.newRelationship(namespace, 'Company',orderRequest.manufacturer.getIdentifier());
+    manufacturerOrder.manufacturer = factory.newRelationship(namespace, 'Manufacturer',orderRequest.manufacturer.getIdentifier());
+
+    // save the manufacturer order
+    const assetRegistry = await getAssetRegistry(manufacturerOrder.getFullyQualifiedType());
+    await assetRegistry.add(manufacturerOrder);
+
+    // emit the event
+    const manufacturerPlaceOrderEvent = factory.newEvent(namespace, 'ManufacturerPlaceOrderEvent');
+    manufacturerPlaceOrderEvent.manufacturerOrderId = manufacturerOrder.manufacturerOrderId;
+    manufacturerPlaceOrderEvent.jewelryDetail = manufacturerOrder.jewelryDetail;
+    manufacturerPlaceOrderEvent.manufacturer = manufacturerOrder.manufacturer;
+    emit(manufacturerPlaceOrderEvent);
 }
 
 /**
@@ -106,21 +154,27 @@ async function manufacturerUpdateOrderStatus(updateOrderRequest){
     const namespace = 'org.acme.jewelry_network';
 
     const jewelryRegistry = await getAssetRegistry(namespace+'.Jewelry');
-    if (updateOrderRequest.retailerOrderStatus === 'JIN_ASSIGNED') {
+    if (updateOrderRequest.retailerOrderStatus === 'DELIVERED') {
         if (!updateOrderRequest.jin) {
             throw new Error('Value for JIN was expected');
         }
 
-        if (!updateOrderRequest.mineFieldId) {
-            throw new Error('Value for mineFieldId was expected');
+        if (!updateOrderRequest.manufacturerId) {
+            throw new Error('Value for manufacturerId was expected');
+        }
+
+        if (!updateOrderRequest.manufacturerSign) {
+            throw new Error('Value for manufacturerSign was expected');
         }
 
         // create a jewelry
-        const jewelry = factory.newResource(namespace,'Jewelry', updateOrderRequest.jin);
+        const jewelry = await jewelryRegistry.get(updateOrderRequest.jin);
         jewelry.jewelryDetail = updateOrderRequest.retailerOrder.jewelryDetail;
-        jewelry.mineFieldId = updateOrderRequest.mineFieldId;
+        jewelry.manufacturerId = updateOrderRequest.manufacturerId;
+        jewelry.manufacturerSign = updateOrderRequest.manufacturerSign;
+       
         jewelry.jewelryStatus = 'CERTIFICATION';
-        await jewelryRegistry.add(jewelry)
+        await jewelryRegistry.update(jewelry)
     }
 
     // update the order
@@ -136,6 +190,57 @@ async function manufacturerUpdateOrderStatus(updateOrderRequest){
     emit(manufacturerUpdateOrderStatusEvent);
 }
 
+//-------------------------------------------------------------------------------------------- add trasaction of miner node √
+
+/**
+ * Minefield updates the status of a manufacturerOrder
+ * @param {org.acme.jewelry_network.MinefieldUpdateOrderStatus} minefieldUpdateOrderStatus - MinefieldUpdateOrderStatus transaction
+ * @transaction
+ */
+async function minefieldUpdateOrderStatus(updateOrderRequest){
+    console.log('minefieldUpdateOrderStatus');
+
+    const factory = getFactory();
+    const namespace = 'org.acme.jewelry_network';
+
+    const jewelryRegistry = await getAssetRegistry(namespace+'.Jewelry');
+    if (updateOrderRequest.manufacturerOrderStatus === 'JIN_ASSIGNED') {
+        if (!updateOrderRequest.jin) {
+            throw new Error('Value for JIN was expected');
+        }
+
+        if (!updateOrderRequest.mineFieldId) {
+            throw new Error('Value for mineFieldId was expected');
+        }
+
+        if (!updateOrderRequest.mineFieldSign) { //-------------------------------- add Sign
+            throw new Error('Value for mineFieldSign was expected');
+        }
+
+        // create a jewelry
+        const jewelry = factory.newResource(namespace,'Jewelry', updateOrderRequest.jin);
+        //jewelry.jewelryDetail = updateOrderRequest.retailerOrder.jewelryDetail;
+        jewelry.mineFieldId = updateOrderRequest.mineFieldId;
+        jewelry.mineFieldSign = updateOrderRequest.mineFieldSign; //-------------------------------- add Sign
+        jewelry.jewelryStatus = 'CERTIFICATION';
+        await jewelryRegistry.add(jewelry)
+    }
+
+    // update the order
+    const manufacturerOrder = updateOrderRequest.manufacturerOrder;
+    manufacturerOrder.manufacturerOrderStatus = updateOrderRequest.manufacturerOrderStatus;
+    const manufacturerOrderRegistry = await getAssetRegistry(namespace + '.ManufacturerOrder');
+    await manufacturerOrderRegistry.update(manufacturerOrder);
+
+    // emit the event
+    const minefieldUpdateOrderStatusEvent = factory.newEvent(namespace, 'MinefieldUpdateOrderStatusEvent');
+    minefieldUpdateOrderStatusEvent.manufacturerOrderStatus = updateOrderRequest.manufacturerOrder.manufacturerOrderStatus;
+    minefieldUpdateOrderStatusEvent.manufacturerOrder = updateOrderRequest.manufacturerOrder;
+    emit(minefieldUpdateOrderStatusEvent);
+}
+
+//-------------------------------------------------------------------
+
 /**
  * Create the participants to use in the demo
  * @param {org.acme.jewelry_network.SetupDemo} setupDemo - the SetupDemo transaction
@@ -150,6 +255,7 @@ async function setupDemo(){
     let customer = ['Ricard','Jason','Bin','Alice','Amo','Vivian','Dexter','Poppy','Ryan','Lance','Takuya','Fay','Douglas','Autumn'];
     let retailers;
     let manufacturers = ['Nova','Saber','Archer'];
+    let minefields = ['MinerA', 'MinerB']
  
 
     const jewelry = {
@@ -265,6 +371,7 @@ async function setupDemo(){
 	for(var manufacturer in manufacturers){
     	const manufacturerResource  = factory.newResource(namespace,'Manufacturer',manufacturers[manufacturer]);
         manufacturerResource.companyName = manufacturers[manufacturer];
+        manufacturerResource.publicKey='adasdasdedasdasd'
          // add the manufacturers
         const manufacturerRegistry = await getParticipantRegistry(namespace + '.Manufacturer');
         await manufacturerRegistry.add(manufacturerResource);
@@ -300,8 +407,8 @@ async function setupDemo(){
                     jewelry.jewelryStatus = jewelrystemplate.jewelryStatus;
                     jewelry.mineFieldId = jewelrystemplate.mineFieldId;
                     jewelry.jewelryDetail = factory.newConcept(namespace,'JewelryDetail');
-                    jewelry.jewelryDetail.make = factory.newResource(namespace,'Manufacturer',manufacturer);
-                    jewelry.jewelryDetail.sell = factory.newResource(namespace,'Retailer',retailer);
+                    //jewelry.jewelryDetail.make = factory.newResource(namespace,'Manufacturer',manufacturer);
+                    //jewelry.jewelryDetail.sell = factory.newResource(namespace,'Retailer',retailer);
                     jewelry.jewelryDetail.ModelType = model;
                     jewelry.jewelryDetail.DiamondWeight = jewelrystemplate.DiamondWeight;
                     jewelry.jewelryDetail.Material = jewelrystemplate.Material;
