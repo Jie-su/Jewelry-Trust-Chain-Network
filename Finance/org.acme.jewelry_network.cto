@@ -161,13 +161,13 @@ transaction ManufacturerPlaceOrder {   //---------------------------------------
   //--> Minefield Manu_Mine
   o JewelryDetail jewelryDetail
   --> Minefield mine
-  -->  Company_2 manufacturer
+  --> Company_2 manufacturer
 }
 
 event ManufacturerPlaceOrderEvent {
   o String manufacturerOrderId
   o JewelryDetail jewelryDetail
-  -->  Company_2 manufacturer
+  --> Company_2 manufacturer
 }
 
 transaction MinefieldUpdateOrderStatus {  //----------------------------------------
@@ -204,8 +204,4 @@ asset Jewelry identified by jin {
   o JewelryDetail jewelryDetail optional
   o JewelryStatus jewelryStatus optional
   --> Person owner optional
-}
-
-// SETUP FEMO
-transaction SetupDemo {
 }
