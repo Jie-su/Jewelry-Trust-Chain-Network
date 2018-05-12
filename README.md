@@ -6,11 +6,11 @@
 
 ### Participants
 
-`Person` `Manufacturer` `Regulator` `Retailer`
+`Person` `Manufacturer` `Retailer` `Minefield` `Regulator`
 
 ### Assets
 
-`CustomerOrder` `Jewelry` `RetailerOrder`
+`CustomerOrder` `Jewelry` `RetailerOrder` `ManufacturerOrder`
 
 ### Transactions
 
