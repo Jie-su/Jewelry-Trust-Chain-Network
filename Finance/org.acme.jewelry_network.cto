@@ -6,9 +6,6 @@ namespace org.acme.jewelry_network
 // BASE DEFINTIONS
 
 concept JewelryDetail {
-  //--> Minefield mine optional
-  //--> Manufacturer make optional
-  //--> Retailer sell optional
   //Model Type: Ring, Necklace, Bracelet
   o String ModelType
   //DiamondWeight: 0.5 ct, 1 ct ..ect
@@ -240,6 +237,11 @@ asset Jewelry identified by jin {
   --> Person owner optional
 }
 
-// SETUP FEMO
-transaction SetupDemo {
+transaction JewelryUpdateStatus {  //----------------------------------------
+  o String owner
+  --> Jewelry jewelry
+}
+
+event JewelryUpdateStatusEvent{
+  o Jewelry jewelry
 }

@@ -280,5 +280,28 @@ async function minefieldUpdateOrderStatus(updateOrderRequest){
     emit(minefieldUpdateOrderStatusEvent);
 }
 
+/**
+ * Customer place an order from the retailer for a jewelry
+ * @param {org.acme.jewelry_network.JewelryUpdateStatus} jewelryUpdateStatus - the customerPlaceOrder transaction
+ * @transaction
+ */
+async function jewelryUpdateStatus(updateOrderRequest){
+    console.log('jewelryUpdateStatus');
+
+    const factory = getFactory();
+    const namespace = 'org.acme.jewelry_network';
+
+    const jewelryRegistry = await getAssetRegistry(namespace+'.Jewelry');
+    const jewelry = await jewelryRegistry.get(updateOrderRequest.jewelry.jin);
+    jewelry.owner = factory.newRelationship(namespace, 'Person', updateOrderRequest.owner);
+    // const jewelryResigstry = await getAssetRegistry(namespace + '.Jewelry');
+    await jewelryRegistry.update(jewelry);
+
+    // emit the event
+    const jewelryUpdateStatusEvent = factory.newEvent(namespace, 'JewelryUpdateStatusEvent');
+    jewelryUpdateStatusEvent.jewelry=updateOrderRequest.jewelry;
+    emit(jewelryUpdateStatusEvent);
+}
+
 
 
